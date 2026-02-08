@@ -1169,35 +1169,35 @@
         </div>
         <div class="instagram-grid">
             <div class="insta-item reveal">
-                <img src="../the wall images/Capture d'écran 2026-02-07 230341.png" alt="The Wall Snack & Resto">
+                <img src="../the wall images/Capture_decran_2026-02-07_230341.png" alt="The Wall Snack & Resto">
                 <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
             </div>
             <div class="insta-item reveal">
-                <img src="../the wall images/Capture d'écran 2026-02-07 230400.png" alt="The Wall Snack & Resto">
+                <img src="../the wall images/Capture_decran_2026-02-07_230400.png" alt="The Wall Snack & Resto">
                 <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
             </div>
             <div class="insta-item reveal">
-                <img src="../the wall images/Capture d'écran 2026-02-07 230425.png" alt="The Wall Snack & Resto">
+                <img src="../the wall images/Capture_decran_2026-02-07_230425.png" alt="The Wall Snack & Resto">
                 <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
             </div>
             <div class="insta-item reveal">
-                <img src="../the wall images/Capture d'écran 2026-02-07 230434.png" alt="The Wall Snack & Resto">
+                <img src="../the wall images/Capture_decran_2026-02-07_230434.png" alt="The Wall Snack & Resto">
                 <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
             </div>
             <div class="insta-item reveal">
-                <img src="../the wall images/Capture d'écran 2026-02-07 230448.png" alt="The Wall Snack & Resto">
+                <img src="../the wall images/Capture_decran_2026-02-07_230448.png" alt="The Wall Snack & Resto">
                 <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
             </div>
             <div class="insta-item reveal">
-                <img src="../the wall images/Capture d'écran 2026-02-07 230454.png" alt="The Wall Snack & Resto">
+                <img src="../the wall images/Capture_decran_2026-02-07_230454.png" alt="The Wall Snack & Resto">
                 <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
             </div>
             <div class="insta-item reveal">
-                <img src="../the wall images/Capture d'écran 2026-02-07 230502.png" alt="The Wall Snack & Resto">
+                <img src="../the wall images/Capture_decran_2026-02-07_230502.png" alt="The Wall Snack & Resto">
                 <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
             </div>
             <div class="insta-item reveal">
-                <img src="../the wall images/Capture d'écran 2026-02-07 230508.png" alt="The Wall Snack & Resto">
+                <img src="../the wall images/Capture_decran_2026-02-07_230508.png" alt="The Wall Snack & Resto">
                 <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
             </div>
         </div>
@@ -1213,7 +1213,7 @@
     <div class="container">
         <div class="about-grid">
             <div class="about-image reveal">
-                <img src="../the wall images/Capture d'écran 2026-02-07 230514.png" alt="The Wall Snack & Resto">
+                <img src="../the wall images/Capture_decran_2026-02-07_230514.png" alt="The Wall Snack & Resto">
             </div>
             <div class="about-content reveal">
                 <div class="section-header" style="text-align: left; margin-bottom: 30px;">
@@ -1360,7 +1360,7 @@
 <script>
     // High-Quality 4K Burger Background System Implementation
     const bgImages = [
-        { base: "wp14485601-burger-4k-wallpapers (1).jpg", high: "wp14485601-burger-4k-wallpapers (1).jpg" },
+        { base: "wp14485601-burger-4k-wallpapers_1.jpg", high: "wp14485601-burger-4k-wallpapers_1.jpg" },
         { base: "wp14485689-burger-4k-wallpapers.jpg", high: "wp14485689-burger-4k-wallpapers.jpg" },
         { base: "wp14485743-burger-4k-wallpapers.jpg", high: "wp14485743-burger-4k-wallpapers.jpg" }
     ].map(function(entry) {
@@ -1395,14 +1395,40 @@
     }
 
     function loadBackgroundEntry(entry, onLoad) {
+        const baseImg = new Image();
+        const highImg = new Image();
+
         if (prefersHighRes) {
-            const highImg = new Image();
+            highImg.onload = () => {
+                onLoad(true); // High quality loaded
+            };
+            highImg.onerror = () => {
+                // High quality failed, try base
+                baseImg.src = entry.base;
+            };
+
+            baseImg.onload = () => {
+                onLoad(false); // Base quality loaded (high failed or not preferred)
+            };
+            baseImg.onerror = () => {
+                // Both high and base failed
+                console.warn(`Failed to load background image: ${entry.base}`);
+                onLoad(null); // Signal complete failure, no image loaded
+            };
+
+            // Start by trying to load the high-res image
             highImg.src = entry.high;
-            highImg.onload = () => onLoad(true);
-            highImg.onerror = () => onLoad(false);
-            return;
+        } else {
+            baseImg.onload = () => {
+                onLoad(false); // Base quality loaded
+            };
+            baseImg.onerror = () => {
+                // Base failed
+                console.warn(`Failed to load background image: ${entry.base}`);
+                onLoad(null); // Signal complete failure, no image loaded
+            };
+            baseImg.src = entry.base;
         }
-        onLoad(false);
     }
 
     function initBackground() {
@@ -1412,55 +1438,19 @@
         }
 
         bgImages.forEach((entry) => {
-            if (prefersHighRes) {
-                loadBackgroundEntry(entry, (useHigh) => {
-                    if (useHigh) {
-                        const slide = document.createElement('div');
-                        slide.className = 'bg-slide';
-                        applyBackgroundImage(slide, entry, true);
-                        bgContainer.appendChild(slide);
-                        slides.push(slide);
-
-                        if (slides.length === 1) {
-                            slide.classList.add('active');
-                        }
-
-                        if (slides.length >= 2 && !animationStarted) {
-                            startBgAnimation();
-                        }
-                        return;
-                    }
-
-                    const baseImg = new Image();
-                    baseImg.src = entry.base;
-                    baseImg.onload = () => {
-                        const slide = document.createElement('div');
-                        slide.className = 'bg-slide';
-                        applyBackgroundImage(slide, entry, false);
-                        bgContainer.appendChild(slide);
-                        slides.push(slide);
-
-                        if (slides.length === 1) {
-                            slide.classList.add('active');
-                        }
-
-                        if (slides.length >= 2 && !animationStarted) {
-                            startBgAnimation();
-                        }
-                    };
-                    baseImg.onerror = () => {
-                        console.warn(`Failed to load background image: ${entry.base}`);
-                    };
-                });
-                return;
-            }
-
-            const baseImg = new Image();
-            baseImg.src = entry.base;
-            baseImg.onload = () => {
+            loadBackgroundEntry(entry, (imageQuality) => {
                 const slide = document.createElement('div');
                 slide.className = 'bg-slide';
-                applyBackgroundImage(slide, entry, false);
+
+                if (imageQuality === true) {
+                    applyBackgroundImage(slide, entry, true);
+                } else if (imageQuality === false) {
+                    applyBackgroundImage(slide, entry, false);
+                } else { // imageQuality === null, meaning both failed
+                    console.warn(`No background image loaded for ${entry.base}. Applying fallback.`);
+                    slide.style.backgroundColor = '#333'; // Fallback background color
+                    // Optionally, you could add a placeholder image or text here
+                }
                 bgContainer.appendChild(slide);
                 slides.push(slide);
 
@@ -1471,10 +1461,7 @@
                 if (slides.length >= 2 && !animationStarted) {
                     startBgAnimation();
                 }
-            };
-            baseImg.onerror = () => {
-                console.warn(`Failed to load background image: ${entry.base}`);
-            };
+            });
         });
     }
 
